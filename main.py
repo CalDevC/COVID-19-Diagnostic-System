@@ -50,8 +50,10 @@ if ("SITK_NOSHOW" not in os.environ):
     simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
     cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
 
+    # Save image as new.png
     writer = sitk.ImageFileWriter()
     writer.SetFileName("images/new.png")
     writer.Execute(cimg)
-    
-    sitk.Show(cimg, "ImageRegistration1 Composition")
+
+    #Display the image using ImageJ
+    sitk.Show(cimg, "Transformed Image")
