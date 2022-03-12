@@ -22,8 +22,8 @@ moving = sitk.ReadImage(sys.argv[2], pixelType)
 
 R = sitk.ImageRegistrationMethod()
 R.SetMetricAsMeanSquares()
-R.SetOptimizerAsRegularStepGradientDescent(4.0, .01, 200)
-# R.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=200)
+# R.SetOptimizerAsRegularStepGradientDescent(4.0, .01, 200)
+R.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=200)
 R.SetInitialTransform(sitk.TranslationTransform(fixed.GetDimension()))
 R.SetInterpolator(sitk.sitkLinear)
 
