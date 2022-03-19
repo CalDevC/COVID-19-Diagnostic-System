@@ -1,26 +1,31 @@
-import sys
+
 import SimpleITK as sitk
+import vtk
+import sys
+import os
 
-grid_image = sitk.GridSource(outputPixelType=sitk.sitkUInt16, size=(512,512),
-                             sigma=(0.1,0.1), gridSpacing=(20.0,20.0))
+viewer = sitk.ImageViewer()
+viewer.SetFileExtension('.nii')
+viewer.SetCommand('C:\Program Files\ImageJ\ImageJ.exe')
 
-# Procedural interface, using the default image viewer (Fiji/ImageJ) or
-# any viewer specified by the SITK_SHOW_COMMAND environment variable.
-sitk.Show(grid_image, title = "grid using Show function", debugOn = True)
+if len(sys.argv) < 3:
+    print("Usage: DicomSeriesReader <input_directory> <output_file>")
+    sys.exit(1)
 
-# Object oriented interface:
-image_viewer = sitk.ImageViewer()
-image_viewer.SetTitle('grid using ImageViewer class')
+print("Reading Dicom directory:", sys.argv[1])
+reader = sitk.ImageSeriesReader()
 
-# Use the default image viewer.
-image_viewer.Execute(grid_image)
+dicom_names = reader.GetGDCMSeriesFileNames(sys.argv[1])
+reader.SetFileNames(dicom_names)
 
-# Change viewer, and display again.
-image_viewer.SetApplication('/Applications/ITK-SNAP.app/Contents/MacOS/ITK-SNAP')
-image_viewer.Execute(grid_image)
+image = reader.Execute()
 
-# Change the viewer command, (use ITK-SNAP's -z option to open the image in zoomed mode)
-image_viewer.SetCommand('/Applications/ITK-SNAP.app/Contents/MacOS/ITK-SNAP -z 2')
-image_viewer.Execute(grid_image)
+size = image.GetSize()
+print("Image size:", size[0], size[1], size[2])
 
-sys.exit( 0 )
+print("Writing image:", sys.argv[2])
+
+sitk.WriteImage(image, sys.argv[2])
+
+
+viewer.Execute(image)
