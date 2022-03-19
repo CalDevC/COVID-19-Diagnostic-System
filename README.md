@@ -9,4 +9,4 @@ To make ImageJ display the image properly you need to set certain environment va
 
 These variables can be set in PowerShell using:
  - `$Env:SITK_SHOW_EXTENSION = "<image-type>"`
- - `$Env:SITK_SHOW_EXTENSION = "<path-to-imagej.exe>"`
+ - `$Env:SITK_SHOW_COMMAND = "<path-to-imagej.exe>"`

@@ -4,6 +4,10 @@ import math
 import sys
 import os
 
+# Set up image viewer with proper settings
+viewer = sitk.ImageViewer()
+viewer.SetFileExtension('.png')
+viewer.SetCommand('C:\Program Files\ImageJ\ImageJ.exe')
 
 def command_iteration(method):
     if (method.GetOptimizerIteration() == 0):
@@ -57,4 +61,5 @@ if ("SITK_NOSHOW" not in os.environ):
     writer.Execute(cimg)
 
     #Display the image using ImageJ
-    sitk.Show(cimg, "Transformed Image")
+    viewer.Execute(cimg)
+    # sitk.Show(cimg, "Transformed Image")
