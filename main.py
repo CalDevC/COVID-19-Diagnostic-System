@@ -32,7 +32,7 @@ sitk.WriteImage(reader2.Execute(), "images/moving.nii")
 
 
 pixelType = sitk.sitkFloat32
-fixedImage = sitk.ReadImage("images/fixed.nii", pixelType, )
+fixedImage = sitk.ReadImage("images/fixed.nii", pixelType)
 movingImage = sitk.ReadImage("images/moving.nii", pixelType)
 
 R = sitk.ImageRegistrationMethod()
