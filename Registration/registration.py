@@ -91,12 +91,13 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
         simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
 
         # Create the final output
-        cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
+        # cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
+        cimg = simg1 // 2. + simg2 // 2.
 
         # Save image as transformedImage in nii format
         writer = sitk.ImageFileWriter()
-        writer.SetFileName("images/transformedImage.nii")
+        writer.SetFileName(outputDirPath)
         writer.Execute(cimg)
 
         #Display the image using ImageJ
-        sitk.Show(cimg, "Transformed Image")
+        sitk.Show(cimg, "Transformed_Image")
