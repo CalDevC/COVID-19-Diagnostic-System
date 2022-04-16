@@ -21,10 +21,17 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
 
     # Use imageSeriesReader to read directory of DICOM images in as 3D images (nii format)
     reader = sitk.ImageSeriesReader()
-    print("Reading DICOM files from directory: ", fixedDir)
-    dicom_names = reader.GetGDCMSeriesFileNames(fixedDir)
-    reader.SetFileNames(dicom_names)
-    sitk.WriteImage(reader.Execute(), "images/fixed.nii")
+    pixelType = sitk.sitkFloat32
+
+    if fixedDir.split(".")[-1] == "nii":
+        fixedImage = sitk.ReadImage(fixedDir, pixelType)
+    else:
+        print("Reading DICOM files from directory: ", fixedDir)
+        dicom_names = reader.GetGDCMSeriesFileNames(fixedDir)
+        reader.SetFileNames(dicom_names)
+        sitk.WriteImage(reader.Execute(), "images/fixed.nii")
+        fixedImage = sitk.ReadImage("images/fixed.nii", pixelType)
+
 
     print("Reading DICOM files from directory: ", movingDir)
     dicom_names = reader.GetGDCMSeriesFileNames(movingDir)
@@ -32,8 +39,6 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
     sitk.WriteImage(reader.Execute(), "images/moving.nii")
 
     # Read in the newly generated 3D nii images
-    pixelType = sitk.sitkFloat32
-    fixedImage = sitk.ReadImage("images/fixed.nii", pixelType)
     movingImage = sitk.ReadImage("images/moving.nii", pixelType)
 
     numberOfBins = 24
