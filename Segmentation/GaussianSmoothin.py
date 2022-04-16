@@ -6,7 +6,6 @@ import argparse
 parser = argparse.ArgumentParser(description="Computes Smoothing With Gaussian Kernel.")
 parser.add_argument("input_image")
 parser.add_argument("output_image")
-parser.add_argument("sigma", type=float)
 args = parser.parse_args()
 
 InputPixelType = itk.F
@@ -21,7 +20,7 @@ reader = itk.ImageFileReader[InputImageType].New()
 reader.SetFileName(args.input_image)
 
 smoothFilter = itk.SmoothingRecursiveGaussianImageFilter.New(reader)
-smoothFilter.SetSigma(args.sigma)
+smoothFilter.SetSigma(2)
 
 rescaler = itk.RescaleIntensityImageFilter[InputImageType, OutputImageType].New()
 rescaler.SetInput(smoothFilter.GetOutput())
