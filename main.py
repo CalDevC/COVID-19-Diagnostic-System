@@ -33,11 +33,24 @@ pixelType = sitk.sitkFloat32
 fixedImage = sitk.ReadImage("images/fixed.nii", pixelType)
 movingImage = sitk.ReadImage("images/moving.nii", pixelType)
 
+numberOfBins = 24
+samplingPercentage = 0.10
+
 # Create our desired registration method
 regMethod = sitk.ImageRegistrationMethod()
-regMethod.SetMetricAsMattesMutualInformation()
-regMethod.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=200)
-regMethod.SetInitialTransform(sitk.TranslationTransform(fixedImage.GetDimension()))
+
+# Similarity metric
+regMethod.SetMetricAsMattesMutualInformation(numberOfBins)
+regMethod.SetMetricSamplingPercentage(samplingPercentage, sitk.sitkWallClock)
+regMethod.SetMetricSamplingStrategy(regMethod.RANDOM)
+
+# Optimizer
+regMethod.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
+
+# Transform
+regMethod.SetInitialTransform(sitk.CenteredTransformInitializer(fixedImage, movingImage, sitk.Euler3DTransform(), sitk.CenteredTransformInitializerFilter.GEOMETRY))
+# regMethod.SetInitialTransform(sitk.TranslationTransform(fixedImage.GetDimension()))
+
 regMethod.SetInterpolator(sitk.sitkLinear)
 
 # Attach our function for outputting information during registration
@@ -48,7 +61,6 @@ outTx = regMethod.Execute(fixedImage, movingImage)
 
 # Print transform along with registration method informatoin
 print("-------")
-print(outTx)
 print(f"Optimizer stop condition: {regMethod.GetOptimizerStopConditionDescription()}")
 print(f" Iteration: {regMethod.GetOptimizerIteration()}")
 print(f" Metric value: {regMethod.GetMetricValue()}")
