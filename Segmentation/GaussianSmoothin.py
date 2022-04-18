@@ -1,34 +1,29 @@
 #!/usr/bin/env python
 
-import itk
+import SimpleITK as sitk
 import argparse
+import os
 
-parser = argparse.ArgumentParser(description="Computes Smoothing With Gaussian Kernel.")
+parser = argparse.ArgumentParser(description="Rescales image to grayscale and smoothes while perserving edges")
 parser.add_argument("input_image")
 parser.add_argument("output_image")
 args = parser.parse_args()
 
-InputPixelType = itk.F
-OutputPixelType = itk.UC
-Dimension = 3
-
-
-InputImageType = itk.Image[InputPixelType, Dimension]
-OutputImageType = itk.Image[OutputPixelType, Dimension]
-
-reader = itk.ImageFileReader[InputImageType].New()
+reader = sitk.ImageFileReader()
 reader.SetFileName(args.input_image)
+image = reader.Execute()
 
-smoothFilter = itk.SmoothingRecursiveGaussianImageFilter.New(reader)
-smoothFilter.SetSigma(2)
+BilateralFilter = sitk.BilateralImageFilter()
+BilateralFilter.SetDomainSigma(0.1)
+BilateralFilter.SetRangeSigma(0.1)
+image = BilateralFilter.Execute(image)
 
-rescaler = itk.RescaleIntensityImageFilter[InputImageType, OutputImageType].New()
-rescaler.SetInput(smoothFilter.GetOutput())
+
+rescaler = sitk.RescaleIntensityImageFilter()
 rescaler.SetOutputMinimum(0)
 rescaler.SetOutputMaximum(255)
+image = rescaler.Execute(image)
 
-writer = itk.ImageFileWriter[OutputImageType].New()
+writer = sitk.ImageFileWriter()
 writer.SetFileName(args.output_image)
-writer.SetInput(rescaler.GetOutput())
-
-writer.Update()
+writer.Execute(image)
