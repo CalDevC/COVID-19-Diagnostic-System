@@ -3,46 +3,46 @@ import os
 
 
 # Output info during transform
-def command_iteration(method):
-    if (method.GetOptimizerIteration() == 0):
-        print("Estimated Scales: ", method.GetOptimizerScales())
-    print(f"{method.GetOptimizerIteration():3} = {method.GetMetricValue():7.5f} : {method.GetOptimizerPosition()}")
+# def command_iteration(method):
+#     if (method.GetOptimizerIteration() == 0):
+#         print("Estimated Scales: ", method.GetOptimizerScales())
+#     print(f"{method.GetOptimizerIteration():3} = {method.GetMetricValue():7.5f} : {method.GetOptimizerPosition()}")
 
 
 def reg(fixedDirPath, movingDirPath, outputDirPath):
-    # Set up image viewer with proper settings
+    # Set up image viewer (ImageJ) with proper settings
     os.environ.setdefault("SITK_SHOW_EXTENSION", ".nii")
 
-    # TODO: Make these files parameters for integration with the other system
-    fixedDir = fixedDirPath
-    movingDir = movingDirPath
+    # File used to write the transform
     transformFile = "transform.txt"
-    outputFile = outputDirPath
 
     # Use imageSeriesReader to read directory of DICOM images in as 3D images (nii format)
     reader = sitk.ImageSeriesReader()
     pixelType = sitk.sitkFloat32
 
-    if fixedDir.split(".")[-1] == "nii":
-        fixedImage = sitk.ReadImage(fixedDir, pixelType)
-    else:
-        print("Reading DICOM files from directory: ", fixedDir)
-        dicom_names = reader.GetGDCMSeriesFileNames(fixedDir)
+    # Determine if the path to the fixed image is a directory of DICOMs 
+    # or a previously generated nii image
+    if fixedDirPath.split(".")[-1] == "nii":
+        fixedImage = sitk.ReadImage(fixedDirPath, pixelType)
+    else:  # If path is a direecctory of DICOMs
+        print("Reading DICOM files from directory: ", fixedDirPath)
+        dicom_names = reader.GetGDCMSeriesFileNames(fixedDirPath)
         reader.SetFileNames(dicom_names)
         sitk.WriteImage(reader.Execute(), "images/fixed.nii")
         fixedImage = sitk.ReadImage("images/fixed.nii", pixelType)
 
-
-    print("Reading DICOM files from directory: ", movingDir)
-    dicom_names = reader.GetGDCMSeriesFileNames(movingDir)
+    # The moving image path should always be a directory of DICOMs so no need to check
+    print("Reading DICOM files from directory: ", movingDirPath)
+    dicom_names = reader.GetGDCMSeriesFileNames(movingDirPath)
     reader.SetFileNames(dicom_names)
     sitk.WriteImage(reader.Execute(), "images/moving.nii")
 
-    # Read in the newly generated 3D nii images
+    # Read in the newly generated moving image (3D)
     movingImage = sitk.ReadImage("images/moving.nii", pixelType)
 
+    # Number of histogram bins used to compute the entropy
     numberOfBins = 24
-    samplingPercentage = 0.10
+    samplingPercentage = 0.30
 
     # Create our desired registration method
     regMethod = sitk.ImageRegistrationMethod()
@@ -57,12 +57,11 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
 
     # Transform
     regMethod.SetInitialTransform(sitk.CenteredTransformInitializer(fixedImage, movingImage, sitk.Euler3DTransform(), sitk.CenteredTransformInitializerFilter.GEOMETRY))
-    # regMethod.SetInitialTransform(sitk.TranslationTransform(fixedImage.GetDimension()))
 
     regMethod.SetInterpolator(sitk.sitkLinear)
 
     # Attach our function for outputting information during registration
-    regMethod.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(regMethod))
+    # regMethod.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(regMethod))
 
     # Generate the transform
     outTx = regMethod.Execute(fixedImage, movingImage)
