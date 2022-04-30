@@ -31,14 +31,14 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
         sitk.WriteImage(reader.Execute(), "images/fixed.nii")
         fixedImage = sitk.ReadImage("images/fixed.nii", pixelType)
 
-    # The moving image path should always be a directory of DICOMs so no need to check
-    print("Reading DICOM files from directory: ", movingDirPath)
-    dicom_names = reader.GetGDCMSeriesFileNames(movingDirPath)
-    reader.SetFileNames(dicom_names)
-    sitk.WriteImage(reader.Execute(), "images/moving.nii")
-
-    # Read in the newly generated moving image (3D)
-    movingImage = sitk.ReadImage("images/moving.nii", pixelType)
+    if movingDirPath.split(".")[-1] == "nii":
+        movingImage = sitk.ReadImage(movingDirPath, pixelType)
+    else:  # If path is a direecctory of DICOMs
+        print("Reading DICOM files from directory: ", movingDirPath)
+        dicom_names = reader.GetGDCMSeriesFileNames(movingDirPath)
+        reader.SetFileNames(dicom_names)
+        # Read in the newly generated moving image (3D)
+        movingImage = sitk.ReadImage("images/moving.nii", pixelType)
 
     # Number of histogram bins used to compute the entropy
     numberOfBins = 24

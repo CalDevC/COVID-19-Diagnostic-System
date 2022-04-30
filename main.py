@@ -37,7 +37,7 @@ dicom_names = reader.GetGDCMSeriesFileNames(testPatient)
 reader.SetFileNames(dicom_names)
 sitk.WriteImage(reader.Execute(), testPatientNIfTI)
 
-binThreshold(testPatientNIfTI, testPatientNIfTI, 100, 120)
+binThreshold(testPatientNIfTI, testPatientNIfTI, 0, 255)
 biLatSmooth(testPatientNIfTI, testPatientNIfTI)
 
 if ("SITK_NOSHOW" not in os.environ):
