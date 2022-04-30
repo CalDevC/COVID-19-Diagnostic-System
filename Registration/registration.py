@@ -42,7 +42,7 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
 
     # Number of histogram bins used to compute the entropy
     numberOfBins = 24
-    samplingPercentage = 0.30
+    samplingPercentage = 0.10
 
     # Create our desired registration method
     regMethod = sitk.ImageRegistrationMethod()
