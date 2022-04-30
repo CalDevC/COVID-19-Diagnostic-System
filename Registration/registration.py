@@ -53,7 +53,7 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
     regMethod.SetMetricSamplingStrategy(regMethod.RANDOM)
 
     # Optimizer
-    regMethod.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
+    regMethod.SetOptimizerAsOnePlusOneEvolutionary()
 
     # Transform
     regMethod.SetInitialTransform(sitk.CenteredTransformInitializer(fixedImage, movingImage, sitk.Euler3DTransform(), sitk.CenteredTransformInitializerFilter.GEOMETRY))

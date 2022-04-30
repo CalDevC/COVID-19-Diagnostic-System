@@ -23,11 +23,15 @@ dicom_names = reader.GetGDCMSeriesFileNames(startingNegPatient)
 reader.SetFileNames(dicom_names)
 sitk.WriteImage(reader.Execute(), normalPatientNIfTI)
 
-print("Starting on normalized image")
+# print("Starting on normalized image")
 
-for i in range(5, 6):
-    print("Using " + str(i))
-    reg(normalPatientNIfTI, negPathTemplate + str(i), normalPatientNIfTI)
+# for i in range(5, 6):
+#     print("Using " + str(i))
+#     reg(normalPatientNIfTI, negPathTemplate + str(i), normalPatientNIfTI)
+
+
+reg(normalPatientNIfTI, testPatient, finalOutput)
+
 
 print("Starting on Segmentation")
 
@@ -37,7 +41,7 @@ dicom_names = reader.GetGDCMSeriesFileNames(testPatient)
 reader.SetFileNames(dicom_names)
 sitk.WriteImage(reader.Execute(), testPatientNIfTI)
 
-binThreshold(testPatientNIfTI, testPatientNIfTI, 0, 255)
+binThreshold(testPatientNIfTI, testPatientNIfTI, 200, 255)
 biLatSmooth(testPatientNIfTI, testPatientNIfTI)
 
 if ("SITK_NOSHOW" not in os.environ):
