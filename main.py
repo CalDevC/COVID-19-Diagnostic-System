@@ -12,8 +12,8 @@ negPathTemplate = "images/negativePatients/negPatient"
 startingNegPatient = "images/negativePatients/negPatient4"
 normalPatientNIfTI = "images/sample.nii"
 
-testPatient = "images/patient1"
-testPatientNIfTI = "images/testPatient.nii"
+testPatient = "images/positiveMaybe"
+testPatientNIfTI = "images/positiveMaybe.nii"
 
 finalOutput = "images/final.nii"
 
@@ -30,7 +30,7 @@ sitk.WriteImage(reader.Execute(), normalPatientNIfTI)
 #     reg(normalPatientNIfTI, negPathTemplate + str(i), normalPatientNIfTI)
 
 
-reg(normalPatientNIfTI, testPatient, finalOutput)
+# reg(normalPatientNIfTI, testPatient, finalOutput)
 
 
 print("Starting on Segmentation")
@@ -41,17 +41,10 @@ dicom_names = reader.GetGDCMSeriesFileNames(testPatient)
 reader.SetFileNames(dicom_names)
 sitk.WriteImage(reader.Execute(), testPatientNIfTI)
 
-binThreshold(testPatientNIfTI, testPatientNIfTI, 200, 255)
-biLatSmooth(testPatientNIfTI, testPatientNIfTI)
+biLatSmooth(normalPatientNIfTI, normalPatientNIfTI)
+binThreshold(normalPatientNIfTI, normalPatientNIfTI, 110, 135, 150)
 
-if ("SITK_NOSHOW" not in os.environ):
-    os.environ.setdefault("SITK_SHOW_EXTENSION", ".nii")
-    NIfTIReader = sitk.ImageFileReader()
-    NIfTIReader.SetImageIO("NiftiImageIO")
-    NIfTIReader.SetFileName(testPatientNIfTI)
-    image = NIfTIReader.Execute()
+biLatSmooth(testPatientNIfTI, finalOutput)
+binThreshold(finalOutput, finalOutput, 110, 135, 50)
 
-    #Display the image using ImageJ
-    sitk.Show(image, "Segmented_Image")
-
-reg(normalPatientNIfTI, testPatientNIfTI, finalOutput)
+reg(normalPatientNIfTI, finalOutput, finalOutput)
