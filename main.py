@@ -2,18 +2,15 @@ from cgi import print_directory
 from Registration.registration import reg
 from Segmentation import *
 import SimpleITK as sitk
-import os
 
 from Segmentation.BilateralSmoothing import biLatSmooth
 from Segmentation.BinaryThreshold import binThreshold
 
-# Main driver code here
-negPathTemplate = "images/negativePatients/negPatient"
-startingNegPatient = "images/negativePatients/negPatient4"
-normalPatientNIfTI = "images/sample.nii"
+startingNegPatient = "images/healthyLung"
+normalPatientNIfTI = "images/healthy.nii"
+normalPatientSegNIfTI = "images/healthySeg.nii"
 
-testPatient = "images/positiveMaybe"
-testPatientNIfTI = "images/positiveMaybe.nii"
+testPatientNIfTI = "images/covidLung.nii"
 
 finalOutput = "images/final.nii"
 
@@ -23,28 +20,22 @@ dicom_names = reader.GetGDCMSeriesFileNames(startingNegPatient)
 reader.SetFileNames(dicom_names)
 sitk.WriteImage(reader.Execute(), normalPatientNIfTI)
 
-# print("Starting on normalized image")
-
-# for i in range(5, 6):
-#     print("Using " + str(i))
-#     reg(normalPatientNIfTI, negPathTemplate + str(i), normalPatientNIfTI)
-
-
-# reg(normalPatientNIfTI, testPatient, finalOutput)
-
+#The below code is needed only if the test patient scan is in DICOM format
+# #Create a NIfTI image from the test patient
+# testPatient = "images/"
+# print("Reading DICOM files from directory: ", testPatient)
+# dicom_names = reader.GetGDCMSeriesFileNames(testPatient)
+# reader.SetFileNames(dicom_names)
+# sitk.WriteImage(reader.Execute(), testPatientNIfTI)
 
 print("Starting on Segmentation")
-
-#Create a NIfTI image from the test patient
-print("Reading DICOM files from directory: ", testPatient)
-dicom_names = reader.GetGDCMSeriesFileNames(testPatient)
-reader.SetFileNames(dicom_names)
-sitk.WriteImage(reader.Execute(), testPatientNIfTI)
-
-biLatSmooth(normalPatientNIfTI, normalPatientNIfTI)
-binThreshold(normalPatientNIfTI, normalPatientNIfTI, 110, 135, 150)
+biLatSmooth(normalPatientNIfTI, normalPatientSegNIfTI)
+binThreshold(normalPatientSegNIfTI, normalPatientSegNIfTI, 80, 120, 100, 0)
 
 biLatSmooth(testPatientNIfTI, finalOutput)
-binThreshold(finalOutput, finalOutput, 110, 135, 50)
+binThreshold(finalOutput, finalOutput, 35, 45, 50, 0)
+print("Segmentation Complete!")
 
-reg(normalPatientNIfTI, finalOutput, finalOutput)
+print("Starting on Registration")
+reg(normalPatientSegNIfTI, finalOutput, finalOutput)
+print("Registration Complete!")

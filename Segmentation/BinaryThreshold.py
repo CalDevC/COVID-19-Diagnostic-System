@@ -12,7 +12,7 @@ import os
 
 # args = parser.parse_args()
 
-def binThreshold(input_image, output_image, lower_threshold, upper_threshold, inside_value):
+def binThreshold(input_image, output_image, lower_threshold, upper_threshold, inside_value, outside_value):
     PixelType = sitk.sitkFloat32
 
     reader = sitk.ImageFileReader()
@@ -23,7 +23,7 @@ def binThreshold(input_image, output_image, lower_threshold, upper_threshold, in
     thresholdFilter = sitk.BinaryThresholdImageFilter()
     thresholdFilter.SetLowerThreshold(lower_threshold)
     thresholdFilter.SetUpperThreshold(upper_threshold)
-    thresholdFilter.SetOutsideValue(0)
+    thresholdFilter.SetOutsideValue(outside_value)
     thresholdFilter.SetInsideValue(inside_value)
     image = thresholdFilter.Execute(image)
 
