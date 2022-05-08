@@ -1,14 +1,6 @@
 import SimpleITK as sitk
 import os
 
-
-# Output info during transform
-# def command_iteration(method):
-#     if (method.GetOptimizerIteration() == 0):
-#         print("Estimated Scales: ", method.GetOptimizerScales())
-#     print(f"{method.GetOptimizerIteration():3} = {method.GetMetricValue():7.5f} : {method.GetOptimizerPosition()}")
-
-
 def reg(fixedDirPath, movingDirPath, outputDirPath):
     # Set up image viewer (ImageJ) with proper settings
     os.environ.setdefault("SITK_SHOW_EXTENSION", ".nii")
@@ -57,17 +49,13 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
 
     # Transform
     regMethod.SetInitialTransform(sitk.CenteredTransformInitializer(fixedImage, movingImage, sitk.Euler3DTransform(), sitk.CenteredTransformInitializerFilter.GEOMETRY))
-
     regMethod.SetInterpolator(sitk.sitkLinear)
-
-    # Attach our function for outputting information during registration
-    # regMethod.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(regMethod))
 
     # Generate the transform
     outTx = regMethod.Execute(fixedImage, movingImage)
 
     # Print transform along with registration method informatoin
-    print("-------")
+    print("=======================================================")
     print(f"Optimizer stop condition: {regMethod.GetOptimizerStopConditionDescription()}")
     print(f" Iteration: {regMethod.GetOptimizerIteration()}")
     print(f" Metric value: {regMethod.GetMetricValue()}")
@@ -90,7 +78,6 @@ def reg(fixedDirPath, movingDirPath, outputDirPath):
         simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
 
         # Create the final output
-        # cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
         cimg = simg1 // 2. + simg2 // 2.
 
         # Save image as transformedImage in nii format

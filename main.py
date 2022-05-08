@@ -13,7 +13,7 @@ normalPatientSegNIfTI = "images/healthySeg.nii"
 testPatientNIfTI = "images/covidLung.nii"
 finalOutput = "images/final.nii"
 
-# Read the dICOM series of the normal patient and save it as a NIfTI file
+# Read the DICOM series of the normal patient and save it as a NIfTI file
 reader = sitk.ImageSeriesReader()
 print("Reading DICOM files from directory: ", normalPatient)
 dicom_names = reader.GetGDCMSeriesFileNames(normalPatient)
